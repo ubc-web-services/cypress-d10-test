@@ -1,0 +1,11 @@
+{
+    "name": "ubc-web-services/cypress-d10-test",
+    "type": "cypress",
+    "description": "A cypress test suite for UBC WS common components",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://it.ubc.ca/services/web-servers-storage/websites",
+    "minimum-stability": "dev",
+    "require": {
+      "drupal/core": "^9 || ^10"
+    }
+  }
