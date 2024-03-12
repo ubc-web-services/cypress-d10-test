@@ -180,7 +180,7 @@ Cypress is an end to end (E2E) testing framework that allows you to test live we
 
 ## Replacing Default Tests With Custom Ones
 
-* Navigate to the `cypress/integration` folder of your project
+* Navigate to the `cypress/e2e` folder of your project
 
 * Replace the files with the `spec.js` files found in the `tests` folder in this repo
 
@@ -195,7 +195,7 @@ Cypress is an end to end (E2E) testing framework that allows you to test live we
 
 * How can I migrate tests to different Cypress accounts?
 
-    * You can replace the files in `cypress/integration` folder with your own spec.js files
+    * You can replace the files in `cypress/e2e` folder with your own spec.js files
 
 * Will my Platform.sh project stop building when tests fail?
 
