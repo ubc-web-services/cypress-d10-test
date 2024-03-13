@@ -5,7 +5,7 @@ module.exports = defineConfig({
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
     setupNodeEvents(on, config) {
-      return require('./cypress/plugins/index.js')(on, config)
+      return require('./vendor/ubc-web-services/cypress-d10-test/cypress/plugins/index.js')(on, config)
     },
     baseUrl: 'https://example.it.ubc.ca.lndo.site',
 
@@ -14,6 +14,13 @@ module.exports = defineConfig({
     
     // Can reduce failure time here
     defaultCommandTimeout: 2000,
+
+    supportFile: "vendor/ubc-web-services/cypress-d10-test/cypress/support/e2e.js",
+
+    specPattern: [
+      "vendor/ubc-web-services/cypress-d10-test/cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
+      "cypress_custom/**/*.cy.{js,jsx,ts,tsx}"
+    ],
 
     // Exclude helper commands from potentially being run
     excludeSpecPattern: [
