@@ -11,7 +11,8 @@ describe("Does add page stuff", {testIsolation: false}, () => {
             if(err.message.includes('Page does not exist')){
                console.log("try node/add/page instead?")
             //    return false;
-            }
+            } 
+
             return true;
         })
     })
@@ -36,7 +37,7 @@ describe("Does add page stuff", {testIsolation: false}, () => {
         cy.get('[data-drupal-selector="edit-submit"]').click();
 
         // Check that title and body text were saved
-        cy.get('.page-title').should("contain", titleMessage);
-        cy.get('.node--type-ubc-page').should("contain", bodyMessage);
+        cy.get('#primary-content').should("contain", titleMessage);
+        cy.get('#primary-content').should("contain", bodyMessage);
     })
 })
