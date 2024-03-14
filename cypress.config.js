@@ -18,13 +18,13 @@ module.exports = defineConfig({
     supportFile: "vendor/ubc-web-services/cypress-d10-test/cypress/support/e2e.js",
 
     specPattern: [
-      "vendor/ubc-web-services/cypress-d10-test/cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
+      "vendor/ubc-web-services/**/cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
       "cypress_custom/**/*.cy.{js,jsx,ts,tsx}"
     ],
 
     // Exclude helper commands from potentially being run
     excludeSpecPattern: [
-      "cypress/e2e/helpers/"
+      "vendor/ubc-web-services/**/cypress/e2e/**/helpers.?(cy.)js"
     ],
   },
 })
