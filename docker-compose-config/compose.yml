@@ -2,6 +2,8 @@ services:
 
   mariadb:
     image: wodby/mariadb:$MARIADB_TAG
+    ports:
+      - "3306:3306"
     container_name: "${PROJECT_NAME}_mariadb"
     stop_grace_period: 30s
     environment:
@@ -12,7 +14,6 @@ services:
       MYSQL_TRANSACTION_ISOLATION: READ-COMMITTED
     volumes:
       - ./mariadb-init:/docker-entrypoint-initdb.d  # Place init .sql file(s) here.
-      - /var/lib/mysql # Use bind mount
 
   php:
     image: wodby/drupal-php:$PHP_TAG
