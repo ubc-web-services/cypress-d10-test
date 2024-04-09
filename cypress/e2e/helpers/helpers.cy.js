@@ -50,10 +50,10 @@ Cypress.Commands.add('compareVersions', (version, minV, maxV) => {
 });
 
 /*
- * Allows cypress to run drush commands
+ * Allows cypress to run drush commands -> uses Makefile to run Docker exec
 */
 Cypress.Commands.add('drush', (command) => {
-    cy.exec("lando drush " + command).then((result) => {
+    cy.exec('make drush ' + command).then((result) => {
         cy.log(result.stdout);
         cy.wrap(result.stdout).as('drushOutput');
       })
@@ -61,20 +61,13 @@ Cypress.Commands.add('drush', (command) => {
 
 /*
  * Login using drush uli 
- * NOTE: doesn't work testing on chrome
+ * NOTE: might not work testing on chrome
 */
 Cypress.Commands.add('doLogin', () => {
     cy.session("Login", () => {
-        cy.drush("user:login --uri=" + Cypress.config('baseUrl'))
+        cy.drush('"user:login --uri=' + Cypress.config('baseUrl') + '"')
             .then(function (url) {
-            try{
                 cy.visit(url);
-            } catch (err) {
-                // Run drush cr if error
-                cy.drush("lando drush cr").then((url) => {
-                    cy.visit(url);
-                });
-            }
-        });
+            });
     });
 }); 

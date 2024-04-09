@@ -7,7 +7,7 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       return require('./vendor/ubc-web-services/cypress-d10-test/cypress/plugins/index.js')(on, config)
     },
-    baseUrl: 'https://example.it.ubc.ca.lndo.site',
+    baseUrl: 'http://localhost',
 
     viewportWidth: 1440,
     viewportHeight: 900,  
@@ -22,7 +22,7 @@ module.exports = defineConfig({
       "cypress_custom/**/*.cy.{js,jsx,ts,tsx}"
     ],
 
-    // Exclude helper commands from potentially being run
+    // Exclude helper commands from potentially being run as tests
     excludeSpecPattern: [
       "vendor/ubc-web-services/**/cypress/e2e/**/helpers.?(cy.)js"
     ],

@@ -14,5 +14,5 @@ $databases['default']['default'] = array (
 $settings['hash_salt']="testing";   // doesn't need to be a good hash for testing purposes
 // add this setting to hide status report error (if domain name changes, this will probably break)
 $settings['trusted_host_patterns'] = [
-  '^drupal.docker.localhost$',
+  '^localhost$',
 ];
