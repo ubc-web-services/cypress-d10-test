@@ -19,11 +19,11 @@ Cypress.Commands.add('doUILogin', (username, password) => {
 });
 
 
-/* 
+/*
  * Compare versions
- *  - version: current version (string)     
+ *  - version: current version (string)
  *  - minV: minimum version (array)         ex. [9, 5, 0] for 9.5.0
- *  - maxV: maximum version (array)         ex. [10, 4, 4] for 10.4.4 
+ *  - maxV: maximum version (array)         ex. [10, 4, 4] for 10.4.4
  */
 Cypress.Commands.add('compareVersions', (version, minV, maxV) => {
     const int0 = version.split('.')[0];
@@ -53,21 +53,20 @@ Cypress.Commands.add('compareVersions', (version, minV, maxV) => {
  * Allows cypress to run drush commands -> uses Makefile to run Docker exec
 */
 Cypress.Commands.add('drush', (command) => {
-    cy.exec('make drush ' + command).then((result) => {
+    cy.exec('lando drush ' + command).then((result) => {
         cy.log(result.stdout);
         cy.wrap(result.stdout).as('drushOutput');
       })
 });
 
 /*
- * Login using drush uli 
- * NOTE: might not work testing on chrome
+ * Login using drush uli
 */
 Cypress.Commands.add('doLogin', () => {
     cy.session("Login", () => {
-        cy.drush('"user:login --uri=' + Cypress.config('baseUrl') + '"')
+        cy.drush('user:login --uri=' + Cypress.config('baseUrl'))
             .then(function (url) {
                 cy.visit(url);
             });
     });
-}); 
+});
