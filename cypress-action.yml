@@ -1,0 +1,54 @@
+name: Cypress tests
+
+on: [workflow_dispatch]
+
+env:
+  PLATFORMSH_CLI_TOKEN: ${{ secrets.PLATFORMSH_CLI_TOKEN }}
+  # NOTE: Edit these to match the appropriate db values!
+  DB_NAME: drupal8
+  DB_USER: drupal8
+  DB_PASSWORD: drupal8
+
+jobs: 
+  build_and_run:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cypress npm dependencies
+        run: npm install cypress --save-dev && npm install cypress-real-events
+
+      - name: Setup Lando
+        uses: lando/setup-lando@v2
+
+      - name: Composer install
+        run: composer install
+
+      - name: Install Platform.sh CLI
+        run: curl -fsS https://platform.sh/cli/installer | php 
+
+      - name: Load certificate
+        run: ~/.platformsh/bin/platform ssh-cert:load -y
+
+      - name: Add public SSH keys to known_hosts 
+        run: | 
+          ssh-keyscan ssh.ca-1.platform.sh >> ~/.ssh/known_hosts
+          ssh-keyscan git.ca-1.platform.sh >> ~/.ssh/known_hosts
+
+      - name: Start local site, set up initial db config
+        run: | 
+          lando start && lando rebuild -y
+          lando drush si --db-url=mysql://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@database:3306/${{ env.DB_NAME }} -y
+
+      - name: Get and use database from platform sh
+        run: |
+          ~/.platformsh/bin/platform db:dump -p ${{ secrets.PROJECT_ID }} -e master -f db--dump.sql
+          lando db-import db--dump.sql
+          lando drush cr
+
+      - name: Turn off css & js aggregation 
+        run: lando drush -y config-set system.performance css.preprocess 0 && lando drush -y config-set system.performance js.preprocess 0
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
