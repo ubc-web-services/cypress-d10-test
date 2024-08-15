@@ -1,212 +1,82 @@
-# Cypress Automated Testing
+# Cypress D10 Testing
 
+Below, you can find instructions on how to set up the Cypress D10 test suite for your project, and how to write tests in Cypress.
 
-## Table of Contents
+> These instructions are also found [on Confluence](https://confluence.it.ubc.ca/display/WebServices/How+to+test+with+Cypress). However,
+these two documents are not kept in sync with each other, and this README should be considered the most up-to-date version.
 
-  * [Introduction](#introduction)
-  * [Architecture](#architecture)
-  * [Project Setup](#project-setup)
-  * [Writing Tests for Cypress](#writing-tests-for-cypress)
-  * [Replacing Default Tests With Custom Ones](#replacing-default-tests-with-custom-ones)
-  * [FAQ & Troubleshooting](#faq--troubleshooting)
-  * [Resources](#resources)
 
-## Introduction
+## Minimal setup:
 
-Cypress is an end to end (E2E) testing framework that allows you to test live websites.
+1. Run `composer require ubc-web-services/cypress-d10-test`
+2. Start up lando as per normal local development
+3. In project root, run `npm install --save-dev cypress && npm install --save-dev cypress-real-events` (should be version 13+, otherwise it should prompt for an update)
+4. To start Cypress, run `npx cypress open`
+5. If prompted, follow the migration steps by accepting all changes (this is if an older version of cypress was already installed)
+6. Overwrite the current cypress.config.js/cypress.json file that is in root with cp -f vendor/ubc-web-services/cypress-d10-test/cypress.config.js . 
+7. At this point, we don't need the cypress folder that is in root. Either delete the folder, or rename to cypress_custom so cypress.config.js sees the tests in there.
+8. Change cypress.config.js baseUrl to the URL of the lando site (e.g. https://exampleitubcca.lndo.site)
 
-## Architecture
+## How to write Cypress tests
 
-* Technologies Used
+A good basic tutorial can be found here: [https://docs.cypress.io/guides/end-to-end-testing/writing-your-first-end-to-end-test](https://docs.cypress.io/guides/end-to-end-testing/writing-your-first-end-to-end-test) 
 
-    * Javascript
-    * Cypress
-    * Bash Scripts
-    * Github Actions
-    * Platform.sh Activity Scripts
+Cypress has made example tests for reference: [https://github.com/cypress-io/cypress-example-recipes](https://github.com/cypress-io/cypress-example-recipes) 
 
-* User Workflow Diagram
+You can also use the tests in vendor/ubc-web-services/cypress-d10-test/e2e as a reference for your own test writing.
 
-  ![Alt Text](https://github.com/ubc-web-services/cypress-test/blob/master/readmeGifs/Presentation%20.png)
+Here is a simple example of a .cy.js file:
 
+```
+describe("[Generic] Test Suite - tests related to XYZ", () => {
+    beforeEach(() => {
+        cy.doLogin();	// triggers login custom helper function, which uses lando drush uli to login
+        cy.visit('/admin/reports/dblog');
+    })
 
-## Project Setup
+    it("Checks that the title loaded (fails if whitescreen)", () => {
+        // cy.get uses CSS selectors 
+        cy.get('#block-gin-page-title').should('contain', 'Recent log messages');
 
-1. Install Cypress:
-    
-    * Ensure you include node_modules in your `.gitignore` file in your root directory
-    
-    * At the root directory of your project, run:  `npm install cypress --save-dev`
+        // using .contains() or .find() are also great ways to "grab hold" of an element, especially if it has bad selector options
+        // Alternative approach
+        cy.contains("Recent log messages").should("exist");
+    })
+})
+```
 
-2. Setup inital run:
-    
-    * In the root directory, add the following code in the `package.json` file
+## How to add your test as a custom test
 
-        ```json
-        "scripts": {
+Inside cypress.config.js, there is the option 'specPattern', which specifies where tests can be found.
 
-            "cypress:open": "cypress open"
+A path for "cypress_custom" has already been added, meaning tests placed inside that folder will be recognized by Cypress (e.g. cypress_custom/test.cy.js or cypress_custom/test/hello.cy.js).
 
-            }
-        
-        ```
+You can also append a path to 'specPattern' to a directory of your choice.
 
-    * Ensure that your `package.json` file is well-formed, it should look something like this if you have other dependencies
+## How to ignore a test
 
-        ```json
-        {
-            "devDependencies": {
-                "cypress": "^8.2.0"
-            },
-                "scripts": {
-                "cypress:open": "cypress open"
-                }
-            
-        }
-        ```
-    * Run `npm run cypress:open` to open Cypress
+Similar to 'specPattern', inside cypress.config.js there is the option 'excludeSpecPattern', which ignores tests that match a particular path.
 
-3. Setup recording for test runs
+There is a path to a file containing helper functions already included, which can be used as reference.
 
-    * Login into UBC Web Services Cypress account on the top right corner
-    
-    * Select Runs in the taskbar and click on "Connect to dashboard" to follow prompts to setup recording for the project
+## How to write "good" tests
 
-    ![Alt Text](https://github.com/ubc-web-services/cypress-test/blob/master/readmeGifs/step3setuprun.gif)
+I don't know!!! However, there are some good resources:
 
-    * Ensure the projectID exists in `cypress.json` file, in addition, copy down the Cypress record key (it should say something like this: `541add07-daee-47c1-851b-73d056ac9963`)
+https://cypress.tips/
 
-4. Insert the Cypress record key as a Secret in project repo:
+https://docs.cypress.io/guides/core-concepts/introduction-to-cypress
 
-    ![Alt Text](https://github.com/ubc-web-services/cypress-test/blob/master/readmeGifs/step4github.gif)
+In general, the docs are quite easy to read: https://docs.cypress.io/guides/
 
-    
-    * Navigate to https://github.com/ubc-web-services/{reponame}/settings/secrets/actions
+## How to avoid committing sensitive parameters to the repository
 
-    * Select "New repository secret"
+See https://docs.cypress.io/guides/guides/environment-variables#Option-2-cypressenvjson on how to add environment variables.
 
-    * Set name to be: `CYPRESS_RECORD_KEY`
+## Project links
 
-    * Set value to be the Cypress record key
+Cypress smoke tests ("default" repo): https://github.com/ubc-web-services/cypress-d10-test
 
-    * Hit add secret to save
+Repo from previous co-op student on testing with Cypress: https://github.com/ubc-web-services/cypress-test#introduction
 
-5. Setup Platform.sh
-
-    * Add the Github token into your project's environmental variables with the following settings:
-           
-        * Name: `GITHUB_AUTH`
-        * Visible during build
-        * Visible during runtime
-
-    * Edit the activity script
-
-        ![Alt Text](https://github.com/ubc-web-services/cypress-test/blob/master/readmeGifs/step5activityscript.gif)
-
-        * Open the `trigger_cypress_testing.js` file in your editor
-
-        * Update the `const ghRepo` field to your project's Github repo's name eg: `example.ubc.ca`
-
-    * Add the activty script to Platform.sh
-
-        ![Alt Text](https://github.com/ubc-web-services/cypress-test/blob/master/readmeGifs/step5addactivityscript.gif)
-    
-        * Head to the project's page, select integrations then `Add integration`
-
-        * Scroll down to the bottom of the page and select `add` under the activity scripts
-
-        * Copy and paste the javascript code from   `trigger_cypress_testing.js` into Javascript code field
-
-        * Insert `environment.push,environment.redeploy` in the Events to report field
-
-        * Insert `complete` in the States to report field
-
-        * Insert * Included environments field
-
-        * Hit save
-
-    * Note: It is possible to add the activity script over the command line, for more infomation please check the documentation https://docs.platform.sh/integrations/activity.html
-
-6. Running the tests
-    
-    * Local: 
-
-        * Ensure you are running the project locally using Lando, as the script only works with Lando
-                 
-        * CD into your project directory and run ` ./runlandotest.sh ` in your terminal
-
-    * Remote:
-
-        * Ensure you have committed the files during the setup steps to master. As Github Action script will not run until its pushed to the master branch
-
-        * Cypress tests will run when Platform.sh projects builds or redeployed
-
-        * Runs can be be manually trigged right https://github.com/ubc-web-services/{YourProjectRepo}/actions/workflows/cypress.yml
-
-## Writing Tests for Cypress
-
-* When writing tests locally, you can replace the domain in `cy.visit('/')` in each of the test files to a domain you want, but ensure not to push this to the remote repo.
-
-* Cypress will automatically re-run the tests the moment you save any changes on your test files
-
-* Examples:
-    
-    1. ```javascript it('contains ubc footer', () =>{
-        cy.get('[id="ubc7-footer"]').should('exist');})
-        ```
-         * The above test is an assertion to see if the ubc footer exists within the DOM
-         * We can use the `cy.get` function to obtain DOM elements and use `should()` to see if the element exists or not
-
-    2. ```javascript  it('contains ubc header top border', () =>{
-        cy.get('[id="ubc7-header"]').should('have.css', 'border-top', '3px');
-        cy.get('[id="ubc7-header"]').should('have.css', 'border-top', 'rgb(0, 33, 69)'); })
-       ```
-         * The second test asserts if the website has the ubc header with the correct border on top
-         * You can also test CSS classes of DOM elements and what they contain in the `should()` function
-
-    3. ``` javascript  it('test number of links in header', ()=>{
-        cy.get('[data-target="#ubc7-global-menu"]').click();
-        cy.get('[id="ubc7-global-header"] > .row-fluid > .offset2 > .reverse').should('exist');
-        cy.get('[id="ubc7-global-header"] > .row-fluid > .offset2 > .reverse >').should('have.length', 8);
-        })
-       ```
-       * The third test asserts the number of links in the UBC search header
-       * You can use CSS selectors as in order to target classes as well when looking for DOM element
-
-* You can check out more examples of Cypress tests by looking at the `spec.js` files in the `tests` folder of this repo 
-
-* You can also see more examples here https://docs.cypress.io/guides/getting-started/writing-your-first-test#Write-your-first-test
-
-
-## Replacing Default Tests With Custom Ones
-
-* Navigate to the `cypress/e2e` folder of your project
-
-* Replace the files with the `spec.js` files found in the `tests` folder in this repo
-
-* You can also write your custom tests and add it to the folder, the files much end with `spec.js` or else Cypress will not execute the tests
-
-
-## FAQ & Troubleshooting
-
-* How do I run tests to different Cypress accounts?
-
-    * Follow step 3 and 4 of the setup process with a different Cypress account 
-
-* How can I migrate tests to different Cypress accounts?
-
-    * You can replace the files in `cypress/e2e` folder with your own spec.js files
-
-* Will my Platform.sh project stop building when tests fail?
-
-    * No, the Cypress tests runs independently from Platform.sh, which means websites will build regardless of the number of tests failed
-
-## Resources
-
-* Platform.sh Activity Scripts documentation
-
-    * https://docs.platform.sh/integrations/activity.html
-
-* Cypress testing documentation
-
-    * https://docs.cypress.io/api/table-of-contents
+Automation post-mortem: https://github.com/ubc-web-services/cypress-d10-test/blob/master/automation-post-mortem.md
