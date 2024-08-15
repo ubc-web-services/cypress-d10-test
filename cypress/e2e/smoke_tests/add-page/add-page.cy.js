@@ -1,20 +1,8 @@
-import { doLogin } from "../../helpers/helpers.cy.js"
-
-describe("Does add page stuff", {testIsolation: false}, () => {
+describe("Generic Test Suite - adds a basic page", {testIsolation: false}, () => {
     
     beforeEach(() => {
         cy.doLogin();
         cy.visit('/node/add/ubc_page');
-
-        // TODO: use this for a site that doesn't have ubc_page
-        cy.on('uncaught:exception', (err, runnable) => {
-            if(err.message.includes('Page does not exist')){
-               console.log("try node/add/page instead?")
-            //    return false;
-            } 
-
-            return true;
-        })
     })
 
     it("Types in the title, summary, and body boxes", () => {
@@ -25,7 +13,7 @@ describe("Does add page stuff", {testIsolation: false}, () => {
         cy.get('[data-drupal-selector="edit-title-wrapper"] input').type(titleMessage).should('have.value', titleMessage);
         // cy.get('[data-drupal-selector="edit-body-0-summary"]').type(summaryMessage).should('have.value', summaryMessage);
         cy.get('.ck[role="textbox"]').realClick().realType(bodyMessage, {delay: 0});
-        
+
         // Check body text was typed
         cy.get('.ck[role="textbox"]').then(el => {
             const editor = el[0].ckeditorInstance;

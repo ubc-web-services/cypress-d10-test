@@ -1,5 +1,3 @@
-import { doLogin } from "../../helpers/helpers.cy.js"
-
 describe("Generic Test Suite - reports/updates", () => {
     beforeEach(() => {
         cy.doLogin();

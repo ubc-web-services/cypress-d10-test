@@ -1,6 +1,3 @@
-import { compareVersions } from "../../helpers/helpers.cy.js"
-import { doLogin } from "../../helpers/helpers.cy.js"
-
 describe('Generic Test Suite - Status Page', {testIsolation: false}, () => {
 
     // Variables to compare versions

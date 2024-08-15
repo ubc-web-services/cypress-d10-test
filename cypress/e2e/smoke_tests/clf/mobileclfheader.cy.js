@@ -1,7 +1,3 @@
-
-
-
-
 describe('CLF Mobile Header Test Suite', () => {
 
     beforeEach((() => {
